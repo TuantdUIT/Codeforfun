@@ -1,0 +1,117 @@
+
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e393dd 0%, #c2f0fc 100%);
+}
+
+h1 {
+  color: #ff6b6b;
+  margin-bottom: 10px;
+}
+
+#gameContainer {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  border: 5px solid #ff6b6b;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.puzzle-piece {
+  position: absolute;
+  user-select: none;
+  border: 1px solid #000;
+  cursor: move;
+  z-index: 10;
+}
+
+#winMessage {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-width: 500px;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6b6b, #ffcc70, #6bffb1);
+  padding: 30px 40px;
+  border-radius: 15px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.6);
+  z-index: 100;
+  border: 3px dashed #fff;
+  opacity: 0;
+  animation: fadeInScale 1.5s ease-in-out forwards;
+  word-wrap: break-word;
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+#heartsContainer {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  overflow: hidden;
+}
+
+.falling-heart {
+  position: absolute;
+  top: -30px;
+  color: #ff4f81;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  opacity: 0.9;
+}
+
+.falling-heart::before {
+  content: "❤️";
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) scale(1.5);
+    opacity: 0;
+  }
+}

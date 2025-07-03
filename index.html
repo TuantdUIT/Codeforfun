@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kỷ niệm 1 năm yêu nhau</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Kỷ niệm 1 năm yêu nhau!</h1>
+
+  <div id="gameContainer">
+    <canvas id="puzzleCanvas" width="1000" height="600" style="display: none;"></canvas>
+    <div id="winMessage">🎉 Ngày 6 tháng 7 năm trước, là thời điểm anh và em chính thức xác định mối quan hệ với nhau. Nhưng trước đó, ngay khoảnh khắc vừa gặp e lần đầu, anh đã cảm nhận được sự rung động trong chính tâm hồn mình. Hi vọng e iu của a sẽ luôn hạnh phúc, luôn thật khỏe mạnh và đạt điều mình mơ ước. Hi vọng em sẽ mãi luôn bên anh. Yêu em rất nhìu !!💖</div>
+  </div>
+
+  <div id="heartsContainer"></div>
+
+  <script>
+    const container = document.getElementById('gameContainer');
+    const canvas = document.getElementById('puzzleCanvas');
+    const ctx = canvas.getContext('2d');
+    const winMessage = document.getElementById('winMessage');
+    const heartsContainer = document.getElementById('heartsContainer');
+
+    const puzzleSize = 3;
+    const pieceSize = 600 / puzzleSize;
+    const pieces = [];
+    let emptySpace = {
+      x: (puzzleSize - 1) * pieceSize,
+      y: (puzzleSize - 1) * pieceSize
+    };
+
+    let selectedPiece = null;
+    let offsetX, offsetY;
+
+    const imageSrc = 'p2.jpg';
+    const image = new Image();
+    image.crossOrigin = "Anonymous";
+    image.src = imageSrc;
+
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, 600, 600);
+      createPuzzlePieces();
+    };
+
+    image.onerror = () => {
+      console.error('Không thể tải ảnh. Vui lòng kiểm tra đường dẫn ảnh.');
+    };
+
+    function createPuzzlePieces() {
+      for (let row = 0; row < puzzleSize; row++) {
+        for (let col = 0; col < puzzleSize; col++) {
+          if (row === puzzleSize - 1 && col === puzzleSize - 1) continue;
+
+          const pieceCanvas = document.createElement('canvas');
+          pieceCanvas.className = 'puzzle-piece';
+          pieceCanvas.width = pieceSize;
+          pieceCanvas.height = pieceSize;
+
+          const pieceCtx = pieceCanvas.getContext('2d');
+          pieceCtx.drawImage(
+            canvas,
+            col * pieceSize, row * pieceSize, pieceSize, pieceSize,
+            0, 0, pieceSize, pieceSize
+          );
+
+          pieces.push({
+            element: pieceCanvas,
+            correctX: col * pieceSize,
+            correctY: row * pieceSize,
+            currentX: col * pieceSize,
+            currentY: row * pieceSize
+          });
+
+          container.appendChild(pieceCanvas);
+          pieceCanvas.style.left = col * pieceSize + 'px';
+          pieceCanvas.style.top = row * pieceSize + 'px';
+
+          pieceCanvas.addEventListener('mousedown', startDragging);
+        }
+      }
+      shufflePieces();
+    }
+
+    function shufflePieces() {
+      for (let i = pieces.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const pieceI = pieces[i];
+        const pieceJ = pieces[j];
+        [pieceI.currentX, pieceJ.currentX] = [pieceJ.currentX, pieceI.currentX];
+        [pieceI.currentY, pieceJ.currentY] = [pieceJ.currentY, pieceI.currentY];
+        pieceI.element.style.left = pieceI.currentX + 'px';
+        pieceI.element.style.top = pieceI.currentY + 'px';
+        pieceJ.element.style.left = pieceJ.currentX + 'px';
+        pieceJ.element.style.top = pieceJ.currentY + 'px';
+      }
+    }
+
+    function startDragging(e) {
+      selectedPiece = pieces.find(piece => piece.element === e.target);
+      if (selectedPiece) {
+        offsetX = e.clientX - selectedPiece.currentX;
+        offsetY = e.clientY - selectedPiece.currentY;
+        selectedPiece.element.style.zIndex = 20;
+        document.addEventListener('mousemove', dragPiece);
+        document.addEventListener('mouseup', stopDragging);
+      }
+    }
+
+    function dragPiece(e) {
+      if (selectedPiece) {
+        selectedPiece.currentX = Math.max(0, Math.min(e.clientX - offsetX, 600 - pieceSize));
+        selectedPiece.currentY = Math.max(0, Math.min(e.clientY - offsetY, 600 - pieceSize));
+        selectedPiece.element.style.left = selectedPiece.currentX + 'px';
+        selectedPiece.element.style.top = selectedPiece.currentY + 'px';
+      }
+    }
+
+    function stopDragging() {
+      if (selectedPiece) {
+        const closestX = Math.round(selectedPiece.currentX / pieceSize) * pieceSize;
+        const closestY = Math.round(selectedPiece.currentY / pieceSize) * pieceSize;
+        const newX = Math.max(0, Math.min(closestX, 600 - pieceSize));
+        const newY = Math.max(0, Math.min(closestY, 600 - pieceSize));
+
+        if (newX === emptySpace.x && newY === emptySpace.y) {
+          selectedPiece.currentX = newX;
+          selectedPiece.currentY = newY;
+          selectedPiece.element.style.left = newX + 'px';
+          selectedPiece.element.style.top = newY + 'px';
+          emptySpace.x = newX;
+          emptySpace.y = newY;
+        } else {
+          selectedPiece.currentX = Math.round(selectedPiece.currentX / pieceSize) * pieceSize;
+          selectedPiece.currentY = Math.round(selectedPiece.currentY / pieceSize) * pieceSize;
+          selectedPiece.element.style.left = selectedPiece.currentX + 'px';
+          selectedPiece.element.style.top = selectedPiece.currentY + 'px';
+        }
+
+        selectedPiece.element.style.zIndex = 10;
+        selectedPiece = null;
+        document.removeEventListener('mousemove', dragPiece);
+        document.removeEventListener('mouseup', stopDragging);
+        checkWin();
+      }
+    }
+
+    function checkWin() {
+      const allCorrect = pieces.every(piece =>
+        piece.currentX === piece.correctX && piece.currentY === piece.correctY
+      );
+
+      if (
+        allCorrect &&
+        emptySpace.x === (puzzleSize - 1) * pieceSize &&
+        emptySpace.y === (puzzleSize - 1) * pieceSize
+      ) {
+        winMessage.style.display = 'block';
+        winMessage.style.animation = 'fadeInScale 1.5s ease-in-out forwards';
+
+        // Rơi tim liên tục trong 60 giây
+        const heartInterval = setInterval(() => {
+          for (let i = 0; i < 10; i++) createFallingHeart();
+        }, 200);
+
+        // Sau 60 giây dừng tim & ẩn thông báo
+        setTimeout(() => {
+          clearInterval(heartInterval);
+          winMessage.style.animation = 'fadeOut 2s ease forwards';
+          heartsContainer.innerHTML = '';
+        }, 60000);
+
+        setTimeout(() => {
+          winMessage.style.display = 'none';
+        }, 62000);
+      }
+    }
+
+    function createFallingHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'falling-heart';
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.fontSize = (Math.random() * 24 + 12) + 'px';
+      heart.style.animationDuration = (Math.random() * 4 + 3) + 's';
+      heartsContainer.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 8000);
+    }
+  </script>
+</body>
+</html>
