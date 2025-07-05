@@ -159,21 +159,18 @@
         winMessage.style.display = 'block';
         winMessage.style.animation = 'fadeInScale 1.5s ease-in-out forwards';
 
-        // Rơi tim liên tục trong 60 giây
+        // Rơi tim liên tục mãi mãi
         const heartInterval = setInterval(() => {
           for (let i = 0; i < 10; i++) createFallingHeart();
         }, 200);
 
-        // Sau 60 giây dừng tim & ẩn thông báo
-        setTimeout(() => {
-          clearInterval(heartInterval);
+        // Khi click vào thông báo, tắt hiệu ứng và ẩn thông điệp
+        winMessage.addEventListener('click', () => {
           winMessage.style.animation = 'fadeOut 2s ease forwards';
-          heartsContainer.innerHTML = '';
-        }, 60000);
-
-        setTimeout(() => {
-          winMessage.style.display = 'none';
-        }, 62000);
+          setTimeout(() => {
+            winMessage.style.display = 'none';
+          }, 2000);
+        });
       }
     }
 
